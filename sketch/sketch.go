@@ -1,6 +1,7 @@
 package sketch
 
 import (
+	"generative-art/util"
 	"image"
 	"image/color"
 	"math/rand"
@@ -52,13 +53,13 @@ func (s *Sketch) Update() {
 	// 1. Obtain color information from the source
 	rndX := rand.Float64() * float64(s.sourceWidth)
 	rndY := rand.Float64() * float64(s.sourceHeight)
-	r, g, b := rgb255(s.source.At(int(rndX), int(rndY)))
+	r, g, b := util.Rgb255(s.source.At(int(rndX), int(rndY)))
 
 	// 2. Determine a destination in the output space
 	destX := rndX * float64(s.DestWidth) / float64(s.sourceWidth)
-	destX += float64(randRange(s.StrokeJitter))
+	destX += float64(util.RandRange(s.StrokeJitter))
 	destY := rndY * float64(s.DestHeight) / float64(s.sourceHeight)
-	destY += float64(randRange(s.StrokeJitter))
+	destY += float64(util.RandRange(s.StrokeJitter))
 
 	// 3. Draw a "stroke" using the desired paramters
 	edges := s.MinEdgeCount + rand.Intn(s.MaxEdgeCount-s.MinEdgeCount+1)
@@ -83,13 +84,4 @@ func (s *Sketch) Update() {
 
 func (s *Sketch) Output() image.Image {
 	return s.dc.Image()
-}
-
-func rgb255(c color.Color) (r, g, b int) {
-	r0, g0, b0, _ := c.RGBA()
-	return int(r0 / 255), int(g0 / 255), int(b0 / 255)
-}
-
-func randRange(max int) int {
-	return -max + rand.Intn(2*max)
 }

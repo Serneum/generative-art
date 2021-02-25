@@ -1,6 +1,8 @@
 package dots
 
 import (
+	"fmt"
+	"generative-art/util"
 	"image"
 	"image/color"
 	"math/rand"
@@ -17,10 +19,8 @@ type UserParams struct {
 	InitialAlpha    float64
 	AlphaIncrease   float64
 	Radius          int
-	Jitter          bool
 	Overlap         bool
-	Fade            bool
-	FadeDirection   string
+	Fade            string
 }
 
 type Dots struct {
@@ -51,27 +51,19 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 		s.increment = rand.Intn(s.Radius) + s.Radius
 	}
 
-	if !s.Fade {
+	if s.Fade == "none" || s.Fade == "" {
 		s.InitialAlpha = 255
-	} else {
-		if s.AlphaIncrease == 0 {
-			totalIncrease := 255 - s.InitialAlpha
-			s.AlphaIncrease = float64(totalIncrease) / float64((s.sourceWidth/s.increment)*(s.sourceHeight/s.increment))
-		}
-
-		if s.FadeDirection == "" {
-			s.FadeDirection = "left"
-		}
+	} else if s.AlphaIncrease == 0 {
+		totalIncrease := 255 - s.InitialAlpha
+		s.AlphaIncrease = float64(totalIncrease) / float64((s.sourceWidth/s.increment)*(s.sourceHeight/s.increment))
 	}
 
-	if s.FadeDirection == "right" {
+	if s.Fade == "right" {
 		s.InitialAlpha = 255 - s.InitialAlpha
 		s.AlphaIncrease *= -1
 	}
 
-	if s.Jitter && s.StrokeJitter == 0 {
-		s.StrokeJitter = int(0.1 * float64(s.DestWidth))
-	}
+	fmt.Printf("Fade: %s, Increment: %d\n", s.Fade, s.increment)
 
 	s.source = source
 	s.dc = canvas
@@ -82,18 +74,19 @@ func (s *Dots) Update() {
 	xOffset := float64(s.DestWidth-(int(s.DestWidth/s.increment)*s.increment)) / 2
 	yOffset := float64(s.DestHeight-(int(s.DestHeight/s.increment)*s.increment)) / 2
 
-	// i += s.Radius provides a cool overlapping effect. Maybe make a DotsOverlap
 	for i := s.Radius; i < s.sourceWidth; i += s.increment {
 		for j := s.Radius; j < s.sourceHeight; j += s.increment {
-			r, g, b := rgb255(s.source.At(int(i), int(j)))
+			r, g, b := util.Rgb255(s.source.At(int(i), int(j)))
 
 			destX := float64(i) * float64(s.DestWidth) / float64(s.sourceWidth)
-			destY := float64(j) * float64(s.DestHeight) / float64(s.sourceHeight)
 			destX += float64(xOffset)
+
+			destY := float64(j) * float64(s.DestHeight) / float64(s.sourceHeight)
 			destY += float64(yOffset)
-			if s.Jitter {
-				destX += float64(randRange(s.StrokeJitter))
-				destY += float64(randRange(s.StrokeJitter))
+
+			if s.StrokeJitter != 0 {
+				destX += float64(util.RandRange(s.StrokeJitter))
+				destY += float64(util.RandRange(s.StrokeJitter))
 			}
 
 			s.dc.SetRGBA255(r, g, b, int(s.InitialAlpha))
@@ -101,9 +94,9 @@ func (s *Dots) Update() {
 			s.dc.FillPreserve()
 
 			s.dc.Stroke()
-			if s.FadeDirection == "random" {
+			if s.Fade == "random" {
 				s.InitialAlpha = float64(rand.Intn(256))
-			} else {
+			} else if s.Fade != "none" {
 				s.InitialAlpha += s.AlphaIncrease
 			}
 		}
@@ -112,13 +105,4 @@ func (s *Dots) Update() {
 
 func (s *Dots) Output() image.Image {
 	return s.dc.Image()
-}
-
-func rgb255(c color.Color) (r, g, b int) {
-	r0, g0, b0, _ := c.RGBA()
-	return int(r0 / 255), int(g0 / 255), int(b0 / 255)
-}
-
-func randRange(max int) int {
-	return -max + rand.Intn(2*max)
 }
