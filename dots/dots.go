@@ -17,8 +17,10 @@ type UserParams struct {
 	InitialAlpha    float64
 	AlphaIncrease   float64
 	Radius          int
-	JitterEnabled   bool
-	OverlapEnabled  bool
+	Jitter          bool
+	Overlap         bool
+	Fade            bool
+	FadeDirection   string
 }
 
 type Dots struct {
@@ -29,6 +31,7 @@ type Dots struct {
 	sourceHeight      int
 	strokeSize        float64
 	initialStrokeSize float64
+	increment         int
 }
 
 func NewDots(source image.Image, userParams UserParams) *Dots {
@@ -43,8 +46,31 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 	canvas.DrawRectangle(0, 0, float64(s.DestWidth), float64(s.DestHeight))
 	canvas.FillPreserve()
 
-	if !s.OverlapEnabled {
+	s.increment = s.Radius * 2
+	if s.Overlap {
+		s.increment = rand.Intn(s.Radius) + s.Radius
+	}
+
+	if !s.Fade {
 		s.InitialAlpha = 255
+	} else {
+		if s.AlphaIncrease == 0 {
+			totalIncrease := 255 - s.InitialAlpha
+			s.AlphaIncrease = float64(totalIncrease) / float64((s.sourceWidth/s.increment)*(s.sourceHeight/s.increment))
+		}
+
+		if s.FadeDirection == "" {
+			s.FadeDirection = "left"
+		}
+	}
+
+	if s.FadeDirection == "right" {
+		s.InitialAlpha = 255 - s.InitialAlpha
+		s.AlphaIncrease *= -1
+	}
+
+	if s.Jitter && s.StrokeJitter == 0 {
+		s.StrokeJitter = int(0.1 * float64(s.DestWidth))
 	}
 
 	s.source = source
@@ -53,21 +79,19 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 }
 
 func (s *Dots) Update() {
-	xOffset := (s.DestWidth - (int(s.DestWidth/s.Radius) * s.Radius)) / 2
-	yOffset := (s.DestHeight - (int(s.DestHeight/s.Radius) * s.Radius)) / 2
+	xOffset := float64(s.DestWidth-(int(s.DestWidth/s.increment)*s.increment)) / 2
+	yOffset := float64(s.DestHeight-(int(s.DestHeight/s.increment)*s.increment)) / 2
 
-	increment := s.Radius * 2
-	if s.OverlapEnabled {
-		increment = rand.Intn(s.Radius) + s.Radius
-	}
 	// i += s.Radius provides a cool overlapping effect. Maybe make a DotsOverlap
-	for i := s.Radius + xOffset; i < s.sourceWidth; i += increment {
-		for j := s.Radius + yOffset; j < s.sourceHeight; j += increment {
+	for i := s.Radius; i < s.sourceWidth; i += s.increment {
+		for j := s.Radius; j < s.sourceHeight; j += s.increment {
 			r, g, b := rgb255(s.source.At(int(i), int(j)))
 
 			destX := float64(i) * float64(s.DestWidth) / float64(s.sourceWidth)
 			destY := float64(j) * float64(s.DestHeight) / float64(s.sourceHeight)
-			if s.JitterEnabled {
+			destX += float64(xOffset)
+			destY += float64(yOffset)
+			if s.Jitter {
 				destX += float64(randRange(s.StrokeJitter))
 				destY += float64(randRange(s.StrokeJitter))
 			}
@@ -77,9 +101,10 @@ func (s *Dots) Update() {
 			s.dc.FillPreserve()
 
 			s.dc.Stroke()
-			if s.OverlapEnabled {
+			if s.FadeDirection == "random" {
 				s.InitialAlpha = float64(rand.Intn(256))
-				// s.InitialAlpha += s.AlphaIncrease
+			} else {
+				s.InitialAlpha += s.AlphaIncrease
 			}
 		}
 	}

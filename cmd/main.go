@@ -25,7 +25,7 @@ func main() {
 
 	destWidth := 2000
 	destHeight := 2000
-	radius := rand.Intn(76) + 25
+	radius := rand.Intn(51) + 25
 	// minEdgeCount := rand.Intn(3) + 3
 	// maxEdgeCount := rand.Intn(3) + minEdgeCount + 1
 	sketch := dots.NewDots(img, dots.UserParams{
@@ -33,11 +33,10 @@ func main() {
 		DestHeight:      destHeight,
 		StrokeRatio:     0.75,
 		StrokeReduction: 0.002,
-		StrokeJitter:    int(0.1 * float64(destWidth)),
 		InitialAlpha:    0.1,
-		AlphaIncrease:   0.06,
 		Radius:          radius,
-		OverlapEnabled:  true,
+		Overlap:         true,
+		Fade:            true,
 	})
 
 	// sketch := sketch.NewSketch(img, sketch.UserParams{
