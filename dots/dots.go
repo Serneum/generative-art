@@ -1,7 +1,6 @@
 package dots
 
 import (
-	"fmt"
 	"generative-art/util"
 	"image"
 	"image/color"
@@ -55,15 +54,15 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 		s.InitialAlpha = 255
 	} else if s.AlphaIncrease == 0 {
 		totalIncrease := 255 - s.InitialAlpha
-		s.AlphaIncrease = float64(totalIncrease) / float64((s.sourceWidth/s.increment)*(s.sourceHeight/s.increment))
+		xIter := float64(s.sourceWidth) / float64(s.increment)
+		yIter := float64(s.sourceHeight) / float64(s.increment)
+		s.AlphaIncrease = float64(totalIncrease) / (float64(xIter * yIter))
 	}
 
 	if s.Fade == "right" {
 		s.InitialAlpha = 255 - s.InitialAlpha
 		s.AlphaIncrease *= -1
 	}
-
-	fmt.Printf("Fade: %s, Increment: %d\n", s.Fade, s.increment)
 
 	s.source = source
 	s.dc = canvas
