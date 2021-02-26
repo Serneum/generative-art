@@ -44,6 +44,7 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 	canvas.SetColor(color.Black)
 	canvas.DrawRectangle(0, 0, float64(s.DestWidth), float64(s.DestHeight))
 	canvas.FillPreserve()
+	canvas.Stroke()
 
 	s.increment = s.Radius * 2
 	if s.Overlap {
@@ -90,9 +91,9 @@ func (s *Dots) Update() {
 
 			s.dc.SetRGBA255(r, g, b, int(s.InitialAlpha))
 			s.dc.DrawCircle(destX, destY, float64(s.Radius))
-			s.dc.FillPreserve()
-
+			s.dc.Fill()
 			s.dc.Stroke()
+
 			if s.Fade == "random" {
 				s.InitialAlpha = float64(rand.Intn(256))
 			} else if s.Fade != "none" {
