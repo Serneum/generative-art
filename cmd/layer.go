@@ -27,9 +27,9 @@ func init() {
 	layerCmd.Flags().Float64VarP(&ratio, "ratio", "", 0.75, "Starting path size as a ratio of image width")
 	layerCmd.Flags().Float64VarP(&alpha, "alpha", "a", 0.1, "Starting alpha")
 	layerCmd.Flags().Float64VarP(&alphaIncrease, "alphaIncrease", "", 0.06, "Increase of alpha per iteration")
-	layerCmd.Flags().IntVarP(&minEdgeCount, "mininumEdges", "", 0, "Minimum number of edges of path")
+	layerCmd.Flags().IntVarP(&minEdgeCount, "minimumEdges", "", 0, "Minimum number of edges of path")
 	layerCmd.Flags().IntVarP(&maxEdgeCount, "maximumEdges", "", 0, "Maximum number of edges of path")
-	layerCmd.Flags().IntVarP(&jitter, "jitter", "", 0, "Jitter multiplier")
+	layerCmd.Flags().Float64VarP(&jitter, "jitter", "", 0, "Jitter multiplier")
 	layerCmd.Flags().Float64VarP(&inversionThreshold, "inversion", "", 0.05, "Size at which to invert the color")
 }
 
@@ -50,7 +50,7 @@ var layerCmd = &cobra.Command{
 			StrokeRatio:              ratio,
 			StrokeReduction:          reduction,
 			StrokeInversionThreshold: inversionThreshold,
-			StrokeJitter:             int(float64(jitter) * float64(width)),
+			StrokeJitter:             int(jitter * float64(width)),
 			InitialAlpha:             alpha,
 			AlphaIncrease:            alphaIncrease,
 			MinEdgeCount:             minEdgeCount,
