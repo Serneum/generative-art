@@ -79,21 +79,7 @@ func (s *Dots) Update() {
 			if s.Fade == "random" {
 				s.currentAlpha = float64(rand.Intn(256))
 			} else if s.Fade != "none" {
-				row, col, iter := j, i, yIter
-				if s.Fade == "top" || s.Fade == "bottom" {
-					row, col, iter = i, j, xIter
-				}
-
-				gridX := col / (s.Radius * 2)
-				gridY := row / (s.Radius * 2)
-				iterationsBeforePos := float64(gridX)*iter + float64(gridY)
-
-				s.currentAlpha = s.InitialAlpha + iterationsBeforePos*s.AlphaIncrease
-				if s.currentAlpha > 255 {
-					s.currentAlpha = 255
-				} else if s.currentAlpha < 0 {
-					s.currentAlpha = 0
-				}
+				s.setCurrentAlpha(i, j, xIter, yIter)
 			}
 
 			s.dc.SetRGBA255(r, g, b, int(s.currentAlpha))
@@ -136,4 +122,22 @@ func (s *Dots) setAlphaSettings() {
 	}
 
 	s.currentAlpha = s.InitialAlpha
+}
+
+func (s *Dots) setCurrentAlpha(iterCol, iterRow int, xIter, yIter float64) {
+	row, col, iter := iterRow, iterCol, yIter
+	if s.Fade == "top" || s.Fade == "bottom" {
+		row, col, iter = iterCol, iterRow, xIter
+	}
+
+	gridX := float64(col) / float64(s.Radius*2)
+	gridY := float64(row) / float64(s.Radius*2)
+	iterationsBeforePos := gridX*iter + gridY
+
+	s.currentAlpha = s.InitialAlpha + iterationsBeforePos*s.AlphaIncrease
+	if s.currentAlpha > 255 {
+		s.currentAlpha = 255
+	} else if s.currentAlpha < 0 {
+		s.currentAlpha = 0
+	}
 }

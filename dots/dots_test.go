@@ -80,13 +80,47 @@ func TestSetAlphaSettings(t *testing.T) {
 	}
 
 	for _, table := range tables {
+		origDots := table.dots
 		table.dots.setAlphaSettings()
 		if table.initialAlpha != table.dots.InitialAlpha || table.alphaIncrease != table.dots.AlphaIncrease {
 			t.Errorf("Incorrect alpha values for fade: '%s', initial alpha: %f, alpha increase: %f\n"+
 				"Got initial alpha: %f, alpha increase: %f\n"+
 				"Expected initial alpha: %f, alpha increase: %f\n",
-				table.dots.Fade, table.dots.InitialAlpha, table.dots.AlphaIncrease,
-				table.initialAlpha, table.alphaIncrease, table.initialAlpha, table.alphaIncrease)
+				table.dots.Fade, origDots.InitialAlpha, origDots.AlphaIncrease,
+				table.dots.InitialAlpha, table.dots.AlphaIncrease,
+				table.initialAlpha, table.alphaIncrease)
+		}
+	}
+}
+
+func TestSetCurrentAlpha(t *testing.T) {
+	tables := []struct {
+		dots         Dots
+		iterRow      int
+		iterCol      int
+		xIter        float64
+		yIter        float64
+		currentAlpha float64
+	}{
+		// TODO: Mock rand, handle "random"
+		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "none", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 5}}, 0, 0, 10, 10, 0.1},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "none", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "left", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "right", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "top", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.163792},
+		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "bottom", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.163792},
+	}
+
+	for _, table := range tables {
+		table.dots.setCurrentAlpha(table.iterRow, table.iterCol, table.xIter, table.yIter)
+		if table.currentAlpha != table.dots.currentAlpha {
+			t.Errorf("Incorrect alpha value for fade: '%s', radius: %d, initial alpha: %f, alpha increase: %f, row: %d, col: %d\n"+
+				"Got: %f\n"+
+				"Expected: %f\n",
+				table.dots.Fade, table.dots.Radius, table.dots.InitialAlpha, table.dots.AlphaIncrease, table.iterRow, table.iterCol,
+				table.dots.currentAlpha,
+				table.currentAlpha)
 		}
 	}
 }
