@@ -47,6 +47,10 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 	canvas.FillPreserve()
 	canvas.Stroke()
 
+	if s.Fade == "" {
+		s.Fade = "none"
+	}
+
 	s.setIncrementSize()
 	s.setAlphaSettings()
 
@@ -76,12 +80,7 @@ func (s *Dots) Update() {
 				destY += float64(util.RandRange(s.StrokeJitter))
 			}
 
-			if s.Fade == "random" {
-				s.currentAlpha = float64(rand.Intn(256))
-			} else if s.Fade != "none" {
-				s.setCurrentAlpha(i, j, xIter, yIter)
-			}
-
+			s.setCurrentAlpha(i, j, xIter, yIter)
 			s.dc.SetRGBA255(r, g, b, int(s.currentAlpha))
 			s.dc.DrawCircle(destX, destY, float64(s.Radius))
 			s.dc.Fill()
@@ -108,7 +107,7 @@ func (s *Dots) setIncrementSize() {
 }
 
 func (s *Dots) setAlphaSettings() {
-	if s.Fade == "none" || s.Fade == "" {
+	if s.Fade == "none" {
 		s.InitialAlpha = 255
 	} else if s.AlphaIncrease == 0 {
 		totalIncrease := 255 - s.InitialAlpha
@@ -125,19 +124,23 @@ func (s *Dots) setAlphaSettings() {
 }
 
 func (s *Dots) setCurrentAlpha(iterCol, iterRow int, xIter, yIter float64) {
-	row, col, iter := iterRow, iterCol, yIter
-	if s.Fade == "top" || s.Fade == "bottom" {
-		row, col, iter = iterCol, iterRow, xIter
-	}
+	if s.Fade == "random" {
+		s.currentAlpha = float64(rand.Intn(256))
+	} else if s.Fade != "none" {
+		row, col, iter := iterRow, iterCol, yIter
+		if s.Fade == "top" || s.Fade == "bottom" {
+			row, col, iter = iterCol, iterRow, xIter
+		}
 
-	gridX := float64(col) / float64(s.Radius*2)
-	gridY := float64(row) / float64(s.Radius*2)
-	iterationsBeforePos := gridX*iter + gridY
+		gridX := float64(col) / float64(s.Radius*2)
+		gridY := float64(row) / float64(s.Radius*2)
+		iterationsBeforePos := gridX*iter + gridY
 
-	s.currentAlpha = s.InitialAlpha + iterationsBeforePos*s.AlphaIncrease
-	if s.currentAlpha > 255 {
-		s.currentAlpha = 255
-	} else if s.currentAlpha < 0 {
-		s.currentAlpha = 0
+		s.currentAlpha = s.InitialAlpha + iterationsBeforePos*s.AlphaIncrease
+		if s.currentAlpha > 255 {
+			s.currentAlpha = 255
+		} else if s.currentAlpha < 0 {
+			s.currentAlpha = 0
+		}
 	}
 }
