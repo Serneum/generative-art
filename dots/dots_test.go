@@ -68,7 +68,6 @@ func TestSetAlphaSettings(t *testing.T) {
 		alphaIncrease float64
 	}{
 		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "none", AlphaIncrease: 0.06, InitialAlpha: 0.1}}, 255, 0.06},
-		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "", AlphaIncrease: 0.06, InitialAlpha: 0.1}}, 255, 0.06},
 		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "left", AlphaIncrease: float64(0), InitialAlpha: 0.1}}, 0.1, 2.549},
 		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "left", AlphaIncrease: 0.06, InitialAlpha: 0.1}}, 0.1, 0.06},
 		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "top", AlphaIncrease: float64(0), InitialAlpha: 0.1}}, 0.1, 2.549},
@@ -103,9 +102,6 @@ func TestSetCurrentAlpha(t *testing.T) {
 		currentAlpha float64
 	}{
 		// TODO: Mock rand, handle "random"
-		{Dots{sourceWidth: 10, sourceHeight: 10, increment: 1, UserParams: UserParams{Fade: "none", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 5}}, 0, 0, 10, 10, 0.1},
-		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
-		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "none", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
 		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "left", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
 		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "right", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.24184},
 		{Dots{sourceWidth: 786, sourceHeight: 960, increment: 1, UserParams: UserParams{Fade: "top", AlphaIncrease: 0.06, InitialAlpha: 0.1, Radius: 25}}, 6, 3, float64(15.72), float64(19.2), 0.163792},
