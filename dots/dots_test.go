@@ -20,7 +20,8 @@ func TestIterationCounts(t *testing.T) {
 				"Got xIter: %f, yIter: %f\n"+
 				"Expected xIter: %f, yIter: %f\n",
 				table.dots.sourceWidth, table.dots.sourceHeight, table.dots.increment,
-				xIter, yIter, table.xIter, table.yIter)
+				xIter, yIter,
+				table.xIter, table.yIter)
 		}
 	}
 }
@@ -45,13 +46,17 @@ func TestSetIncrementSize(t *testing.T) {
 				t.Errorf("Incorrect increment size returned for radius: %d, overlap: %v\n"+
 					"Got %d\n"+
 					"Expected %d\n",
-					table.dots.Radius, table.dots.Overlap, table.dots.increment, 2*table.dots.Radius)
+					table.dots.Radius, table.dots.Overlap,
+					table.dots.increment,
+					2*table.dots.Radius)
 			}
 		} else if table.dots.increment != 2*table.dots.Radius {
 			t.Errorf("Incorrect increment size returned for radius: %d, overlap: %v\n"+
 				"Got %d\n"+
 				"Expected %d\n",
-				table.dots.Radius, table.dots.Overlap, table.dots.increment, 2*table.dots.Radius)
+				table.dots.Radius, table.dots.Overlap,
+				table.dots.increment,
+				2*table.dots.Radius)
 		}
 	}
 }
