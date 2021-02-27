@@ -19,7 +19,7 @@ var (
 	ratio              = float64(0)
 	alpha              = float64(0)
 	alphaIncrease      = float64(0)
-	jitter             = 0
+	jitter             = float64(0)
 	width              = 2000
 	height             = 2000
 	inversionThreshold = float64(5)

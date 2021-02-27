@@ -24,7 +24,7 @@ func init() {
 	dotsCmd.Flags().Float64VarP(&alpha, "alpha", "a", 0.1, "Starting alpha")
 	dotsCmd.Flags().Float64VarP(&alphaIncrease, "alphaIncrease", "i", 0.06, "Increase of alpha per iteration")
 	dotsCmd.Flags().StringVarP(&fade, "fade", "f", "none", "Direction to fade the image in")
-	dotsCmd.Flags().IntVarP(&jitter, "jitter", "j", 0, "Jitter multiplier")
+	dotsCmd.Flags().Float64VarP(&jitter, "jitter", "j", 0, "Jitter multiplier")
 	dotsCmd.Flags().BoolVarP(&overlap, "overlap", "o", false, "Allow the dots to overlap each other")
 	dotsCmd.Flags().IntVarP(&radius, "radius", "r", 25, "The radius of the dots when creating the image")
 	dotsCmd.Flags().Float64VarP(&ratio, "ratio", "t", 0.75, "Starting path size as a ratio of image width")
@@ -47,7 +47,7 @@ var dotsCmd = &cobra.Command{
 			Radius:          radius,
 			Overlap:         overlap,
 			Fade:            fade,
-			StrokeJitter:    jitter,
+			StrokeJitter:    int(jitter * float64(width)),
 		})
 
 		dots.Update()
