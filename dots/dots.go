@@ -47,26 +47,9 @@ func NewDots(source image.Image, userParams UserParams) *Dots {
 	canvas.FillPreserve()
 	canvas.Stroke()
 
-	s.increment = s.Radius * 2
-	if s.Overlap {
-		s.increment = rand.Intn(s.Radius) + s.Radius
-	}
+	s.setIncrementSize()
+	s.setAlphaSettings()
 
-	if s.Fade == "none" || s.Fade == "" {
-		s.InitialAlpha = 255
-	} else if s.AlphaIncrease == 0 {
-		totalIncrease := 255 - s.InitialAlpha
-		xIter := float64(s.sourceWidth) / float64(s.increment)
-		yIter := float64(s.sourceHeight) / float64(s.increment)
-		s.AlphaIncrease = float64(totalIncrease) / (float64(xIter * yIter))
-	}
-
-	if s.Fade == "right" || s.Fade == "bottom" {
-		s.InitialAlpha = 255 - s.InitialAlpha
-		s.AlphaIncrease *= -1
-	}
-
-	s.currentAlpha = s.InitialAlpha
 	s.source = source
 	s.dc = canvas
 	return s
@@ -76,8 +59,7 @@ func (s *Dots) Update() {
 	xOffset := float64(s.DestWidth-(int(s.DestWidth/s.increment)*s.increment)) / 2
 	yOffset := float64(s.DestHeight-(int(s.DestHeight/s.increment)*s.increment)) / 2
 
-	xIter := float64(s.sourceWidth) / float64(s.increment)
-	yIter := float64(s.sourceHeight) / float64(s.increment)
+	xIter, yIter := s.iterationCounts()
 
 	for i := s.Radius; i < s.sourceWidth; i += s.increment {
 		for j := s.Radius; j < s.sourceHeight; j += s.increment {
@@ -124,4 +106,34 @@ func (s *Dots) Update() {
 
 func (s *Dots) Output() image.Image {
 	return s.dc.Image()
+}
+
+func (s *Dots) iterationCounts() (xIter, yIter float64) {
+	xIter = float64(s.sourceWidth) / float64(s.increment)
+	yIter = float64(s.sourceHeight) / float64(s.increment)
+	return xIter, yIter
+}
+
+func (s *Dots) setIncrementSize() {
+	s.increment = s.Radius * 2
+	if s.Overlap {
+		s.increment = rand.Intn(s.Radius) + s.Radius
+	}
+}
+
+func (s *Dots) setAlphaSettings() {
+	if s.Fade == "none" || s.Fade == "" {
+		s.InitialAlpha = 255
+	} else if s.AlphaIncrease == 0 {
+		totalIncrease := 255 - s.InitialAlpha
+		xIter, yIter := s.iterationCounts()
+		s.AlphaIncrease = float64(totalIncrease) / (float64(xIter * yIter))
+	}
+
+	if s.Fade == "right" || s.Fade == "bottom" {
+		s.InitialAlpha = 255 - s.InitialAlpha
+		s.AlphaIncrease *= -1
+	}
+
+	s.currentAlpha = s.InitialAlpha
 }
